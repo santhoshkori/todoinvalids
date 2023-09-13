@@ -228,6 +228,8 @@ app.get("/agenda/", async (request, response) => {
 //api---4Create a todo in the todo table,
 app.post("/todos/", async (request, response) => {
   const { id, todo, priority, status, category, dueDate } = request.body;
+  const formatted_date = format_date(new Date(dueDate), "yyyy-MM-dd");
+
   const statusValid = ["TO DO", "IN PROGRESS", "DONE"];
   const priorityvalid = ["HIGH", "MEDIUM", "LOW"];
   const categoryValids = ["WORK", "HOME", "LEARNING"];
@@ -252,6 +254,7 @@ app.post("/todos/", async (request, response) => {
       myboolean = false;
       response.status(400);
       response.send("Invalid Due Date");
+      break;
     default:
       break;
   }
@@ -262,7 +265,7 @@ app.post("/todos/", async (request, response) => {
   
   (id,todo,priority,status,category,due_date)
   VALUES
-  (${id},"${todo}","${priority}","${status}","${category}","${dueDate}")
+  (${id},"${todo}","${priority}","${status}","${category}","${formatted_date}")
   ;`;
     const post_data = await todo_DB.run(post_data_query);
     response.send("Todo Successfully Added");
@@ -351,6 +354,7 @@ app.put("/todos/:todoId/", async (request, response) => {
         const validcategory = await todo_DB.run(validcategory_query);
         response.send(`Category Updated`);
       }
+      break;
     case request.body.dueDate !== undefined:
       const vlidatetime = isValid(new Date(dueDate));
       if (vlidatetime === false) {
