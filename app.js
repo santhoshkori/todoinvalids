@@ -228,47 +228,54 @@ app.get("/agenda/", async (request, response) => {
 //api---4Create a todo in the todo table,
 app.post("/todos/", async (request, response) => {
   const { id, todo, priority, status, category, dueDate } = request.body;
-  const formatted_date = format_date(new Date(dueDate), "yyyy-MM-dd");
+  const isValidDueDate = isValid(new Date(dueDate));
+  console.log(isValidDueDate);
+  if (!isValidDueDate) {
+    response.send("Invalid Due Date");
+    response.status(400);
+  } else {
+    const formatted_date = format_date(new Date(dueDate), "yyyy-MM-dd");
 
-  const statusValid = ["TO DO", "IN PROGRESS", "DONE"];
-  const priorityvalid = ["HIGH", "MEDIUM", "LOW"];
-  const categoryValids = ["WORK", "HOME", "LEARNING"];
-  let myboolean = true;
-  switch (false) {
-    case statusValid.includes(status):
-      myboolean = false;
-      response.status(400);
-      response.send("Invalid Todo Status");
-      break;
-    case priorityvalid.includes(priority):
-      myboolean = false;
-      response.status(400);
-      response.send("Invalid Todo Priority");
-      break;
-    case categoryValids.includes(category):
-      myboolean = false;
-      response.status(400);
-      response.send("Invalid Todo Category");
-      break;
-    case isValid(new Date(dueDate)):
-      myboolean = false;
-      response.status(400);
-      response.send("Invalid Due Date");
-      break;
-    default:
-      break;
-  }
-  console.log(myboolean);
-  if (myboolean === true) {
-    const post_data_query = `
+    const statusValid = ["TO DO", "IN PROGRESS", "DONE"];
+    const priorityvalid = ["HIGH", "MEDIUM", "LOW"];
+    const categoryValids = ["WORK", "HOME", "LEARNING"];
+    let myboolean = true;
+    switch (false) {
+      case statusValid.includes(status):
+        myboolean = false;
+        response.status(400);
+        response.send("Invalid Todo Status");
+        break;
+      case priorityvalid.includes(priority):
+        myboolean = false;
+        response.status(400);
+        response.send("Invalid Todo Priority");
+        break;
+      case categoryValids.includes(category):
+        myboolean = false;
+        response.status(400);
+        response.send("Invalid Todo Category");
+        break;
+      case isValid(new Date(dueDate)):
+        myboolean = false;
+        response.status(400);
+        response.send("Invalid Due Date");
+        break;
+      default:
+        break;
+    }
+    console.log(myboolean);
+    if (myboolean === true) {
+      const post_data_query = `
   INSERT INTO todo
   
   (id,todo,priority,status,category,due_date)
   VALUES
   (${id},"${todo}","${priority}","${status}","${category}","${formatted_date}")
   ;`;
-    const post_data = await todo_DB.run(post_data_query);
-    response.send("Todo Successfully Added");
+      const post_data = await todo_DB.run(post_data_query);
+      response.send("Todo Successfully Added");
+    }
   }
 });
 
